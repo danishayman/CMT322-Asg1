@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function StudentLayout({
   children,
@@ -11,6 +11,8 @@ export default function StudentLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const sidebarRef = useRef<HTMLElement>(null);
 
   const navLinks = [
     { 
@@ -36,12 +38,34 @@ export default function StudentLayout({
 
   const isActive = (path: string) => pathname === path;
 
+  // Handle clicking outside sidebar to collapse it
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // Only collapse on desktop when expanded
+      if (window.innerWidth >= 1024 && !isCollapsed) {
+        const target = event.target as Node;
+        if (sidebarRef.current && !sidebarRef.current.contains(target)) {
+          // Check if click is not on the toggle button in navbar
+          const toggleButton = document.querySelector('[aria-label="Toggle sidebar"]');
+          if (toggleButton && !toggleButton.contains(target)) {
+            setIsCollapsed(true);
+          }
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isCollapsed]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Navbar */}
       <nav className="bg-white border-b border-gray-200 fixed w-full top-0 z-30 shadow-sm">
         <div className="px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          {/* Mobile menu button */}
+          {/* Mobile menu button (visible on mobile) */}
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="lg:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-all duration-200"
@@ -49,6 +73,22 @@ export default function StudentLayout({
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
+          {/* Desktop collapse button (visible on desktop) */}
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="hidden lg:block p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-all duration-200"
+            aria-label="Toggle sidebar"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d={isCollapsed ? "M13 5l7 7-7 7M5 5l7 7-7 7" : "M11 19l-7-7 7-7m8 14l-7-7 7-7"}
+              />
             </svg>
           </button>
 
@@ -70,12 +110,21 @@ export default function StudentLayout({
 
       {/* Sidebar */}
       <aside
+        ref={sidebarRef}
         className={`
-          fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 
+          fixed left-0 top-16 h-[calc(100vh-4rem)] 
           bg-white border-r border-gray-200 shadow-lg
-          transform transition-transform duration-300 ease-in-out z-20 
-          lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+          transform transition-all duration-300 ease-in-out z-20 
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+          lg:translate-x-0 
+          ${isCollapsed ? 'lg:w-20 lg:cursor-pointer' : 'lg:w-64'}
         `}
+        onClick={(e) => {
+          // Only expand on desktop when collapsed and not clicking on a button
+          if (isCollapsed && window.innerWidth >= 1024 && !(e.target as HTMLElement).closest('button')) {
+            setIsCollapsed(false);
+          }
+        }}
       >
         <div className="p-4 h-full flex flex-col">
           {/* Navigation Links */}
@@ -94,12 +143,14 @@ export default function StudentLayout({
                     ? 'bg-[#5e2a84] text-white shadow-md'
                     : 'text-gray-700 hover:bg-purple-50 hover:text-[#5e2a84]'
                   }
+                  ${isCollapsed ? 'lg:justify-center' : ''}
                 `}
+                title={isCollapsed ? link.name : ''}
               >
                 <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={link.icon} />
                 </svg>
-                <span>{link.name}</span>
+                <span className={`${isCollapsed ? 'lg:hidden' : ''}`}>{link.name}</span>
               </button>
             ))}
           </nav>
@@ -107,12 +158,18 @@ export default function StudentLayout({
           {/* Logout Button */}
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200 mt-auto font-medium text-sm"
+            className={`
+              w-full flex items-center gap-3 px-4 py-3 rounded-lg 
+              text-gray-700 hover:bg-red-50 hover:text-red-600 
+              transition-all duration-200 mt-auto font-medium text-sm
+              ${isCollapsed ? 'lg:justify-center' : ''}
+            `}
+            title={isCollapsed ? 'Logout' : ''}
           >
             <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            <span>Logout</span>
+            <span className={`${isCollapsed ? 'lg:hidden' : ''}`}>Logout</span>
           </button>
         </div>
       </aside>
@@ -126,7 +183,10 @@ export default function StudentLayout({
       )}
 
       {/* Main Content */}
-      <main className="pt-16 lg:pl-64 min-h-screen">
+      <main className={`
+        pt-16 min-h-screen transition-all duration-300 ease-in-out
+        ${isCollapsed ? 'lg:pl-20' : 'lg:pl-64'}
+      `}>
         <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
           {children}
         </div>
