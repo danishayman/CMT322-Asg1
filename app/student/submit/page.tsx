@@ -92,9 +92,9 @@ export default function SubmitComplaintPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-3xl mx-auto space-y-6">
       {/* Page Title */}
-      <div className="mb-8">
+      <div>
         <h1 className="text-3xl font-bold text-gray-900">Submit New Complaint</h1>
         <p className="text-gray-600 mt-2">
           Please provide details about your complaint. We&apos;ll review it as soon as possible.
@@ -103,7 +103,7 @@ export default function SubmitComplaintPage() {
 
       {/* Success Message */}
       {showSuccess && (
-        <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3 animate-fade-in">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3 transition-all duration-300">
           <svg
             className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5"
             fill="none"
@@ -117,7 +117,7 @@ export default function SubmitComplaintPage() {
               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <div>
+          <div className="flex-1">
             <h3 className="font-semibold text-green-900">Complaint Submitted Successfully!</h3>
             <p className="text-green-700 text-sm mt-1">
               Your complaint has been received and will be reviewed by our team.
@@ -127,9 +127,9 @@ export default function SubmitComplaintPage() {
       )}
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sm:p-8 space-y-6">
         {/* Category Field */}
-        <div className="mb-6">
+        <div>
           <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
             Category <span className="text-red-500">*</span>
           </label>
@@ -139,7 +139,7 @@ export default function SubmitComplaintPage() {
             value={formData.category}
             onChange={handleInputChange}
             required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5e2a84] focus:border-transparent transition-all hover:border-gray-400"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#5e2a84] focus:border-transparent transition-all duration-200 hover:border-gray-400 cursor-pointer"
           >
             <option value="">Select a category</option>
             {categories.map((cat) => (
@@ -151,7 +151,7 @@ export default function SubmitComplaintPage() {
         </div>
 
         {/* Title Field */}
-        <div className="mb-6">
+        <div>
           <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
             Title <span className="text-red-500">*</span>
           </label>
@@ -163,12 +163,12 @@ export default function SubmitComplaintPage() {
             onChange={handleInputChange}
             required
             placeholder="Brief summary of your complaint"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5e2a84] focus:border-transparent transition-all hover:border-gray-400"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5e2a84] focus:border-transparent transition-all duration-200 hover:border-gray-400"
           />
         </div>
 
         {/* Description Field */}
-        <div className="mb-6">
+        <div>
           <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
             Description <span className="text-red-500">*</span>
           </label>
@@ -180,12 +180,12 @@ export default function SubmitComplaintPage() {
             required
             rows={6}
             placeholder="Please provide detailed information about your complaint..."
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5e2a84] focus:border-transparent transition-all hover:border-gray-400 resize-none"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5e2a84] focus:border-transparent transition-all duration-200 hover:border-gray-400 resize-none"
           />
         </div>
 
         {/* Photo Upload Field */}
-        <div className="mb-8">
+        <div>
           <label htmlFor="photo" className="block text-sm font-medium text-gray-700 mb-2">
             Photo Upload (Optional)
           </label>
@@ -212,7 +212,7 @@ export default function SubmitComplaintPage() {
               <div className="flex items-center justify-center w-full">
                 <label
                   htmlFor="photo"
-                  className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors"
+                  className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-purple-50 hover:border-[#5e2a84] transition-all duration-200"
                 >
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                     <svg
@@ -248,10 +248,25 @@ export default function SubmitComplaintPage() {
         </div>
 
         {/* Submit Button */}
-        <div className="flex justify-end">
+        <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
+          <button
+            type="button"
+            onClick={() => {
+              setFormData({
+                category: '',
+                title: '',
+                description: '',
+                photo: null,
+              });
+              setPhotoPreview(null);
+            }}
+            className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition-all duration-200"
+          >
+            Clear Form
+          </button>
           <button
             type="submit"
-            className="px-8 py-3 bg-[#5e2a84] text-white font-medium rounded-lg hover:bg-[#4a2169] focus:outline-none focus:ring-2 focus:ring-[#5e2a84] focus:ring-offset-2 transition-all shadow-sm hover:shadow-md"
+            className="px-8 py-3 bg-[#5e2a84] text-white font-medium rounded-lg hover:bg-[#4a2169] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#5e2a84] focus:ring-offset-2 transition-all duration-200 shadow-md"
           >
             Submit Complaint
           </button>
