@@ -34,22 +34,22 @@ export default function StudentDashboard() {
   const recentComplaints = [
     {
       id: 1,
-      title: 'Library WiFi Not Working',
-      category: 'IT Services',
+      title: 'Broken Air Conditioner in Room B-305',
+      category: 'Room Maintenance',
       status: 'In Progress',
       date: 'Oct 28, 2024',
     },
     {
       id: 2,
-      title: 'Air Conditioning Issue in Lecture Hall',
-      category: 'Facilities',
+      title: 'Water Leakage from Bathroom Ceiling',
+      category: 'Plumbing',
       status: 'Pending',
       date: 'Oct 27, 2024',
     },
     {
       id: 3,
-      title: 'Course Registration Problem',
-      category: 'Academic',
+      title: 'Non-Functional Study Room Light',
+      category: 'Common Areas',
       status: 'Resolved',
       date: 'Oct 25, 2024',
     },

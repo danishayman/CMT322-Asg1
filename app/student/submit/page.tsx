@@ -21,12 +21,13 @@ export default function SubmitComplaintPage() {
   const [showSuccess, setShowSuccess] = useState(false);
 
   const categories = [
-    'Academic',
-    'Facilities',
-    'Administrative',
-    'IT Services',
-    'Library',
-    'Accommodation',
+    'Room Maintenance',
+    'Plumbing',
+    'Electrical',
+    'Cleanliness',
+    'Common Areas',
+    'Security',
+    'Noise Complaint',
     'Other',
   ];
 

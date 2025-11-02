@@ -55,7 +55,7 @@ export default function StudentLayout({
           {/* Logo/Title */}
           <div className="flex items-center gap-2">
             <h1 className="text-lg sm:text-xl font-bold text-gray-900">
-              USM Helpdesk <span className="text-[#5e2a84]">|</span> <span className="text-gray-600 font-normal">Student Portal</span>
+              USM Hostel <span className="text-[#5e2a84]">|</span> <span className="text-gray-600 font-normal">Complaint Portal</span>
             </h1>
           </div>
 
