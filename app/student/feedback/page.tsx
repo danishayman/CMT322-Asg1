@@ -4,6 +4,8 @@ import { useState, FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import {StarRating} from '@/components/ui/star_rating'
 import { Input } from '@/components/ui/input';
+import { RadioGroup , RadioGroupItem} from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 import {
     Select,
     SelectContent,
@@ -55,13 +57,13 @@ export default function Feedback(){
         <div className='max-w-3xl mx-auto space-y-6'>
             
             {/* Page Heading */}
-            <div className='py-10'>
+            <div className='py-2'>
                 <h1 className="text-3xl font-bold text-gray-900">Feedback Form</h1>
-                <p className="text-gray-600 mt-2">Please leave a feedback to improve our service!</p>
+                <p className="text-gray-600 mt-1">Please leave a feedback to improve our service!</p>
             </div>
             
             {/* Feedback Form */}
-            <form className='bg-white rounded-lg shadow-sm border border-gray-200 p-6 sm:p-8 space-y-6'>
+            <form className='bg-white rounded-lg shadow-sm border border-gray-200 sm:p-8 space-y-6'>
                 <div className='pb-5'>
                     <div className='pb-2'>
                         <h1 className=''>Complaint</h1>
@@ -107,9 +109,17 @@ export default function Feedback(){
                         <h1 className=''>Repair Quality</h1>
                     </div>
                     <div className='justify-start w-150'>
-                        <Input>
-
-                        </Input>
+                        <RadioGroup orientation='horizontal' defaultValue="good">
+                            <div className="flex items-center gap-3">
+                                <RadioGroupItem value="good" id="r1" />
+                                <p>good</p>
+                                <RadioGroupItem value="acceptable" id="r2" />
+                                <p>acceptable</p>
+                                <RadioGroupItem value="bad" id="r3" />
+                                <p>bad</p>
+                            </div>
+                            
+                        </RadioGroup>
                     </div>
                 </div>
                 <div className='pb-5'>
@@ -117,9 +127,19 @@ export default function Feedback(){
                         <h1 className=''>Response Speed</h1>
                     </div>
                     <div className='justify-start w-150'>
-                        <Input>
-
-                        </Input>
+                        <RadioGroup orientation='horizontal' defaultValue="comfortable">
+                            <div className="flex items-center gap-3">
+                                <RadioGroupItem value="within a few hours" id="r1" />
+                                <p>within a few hours</p>
+                                <RadioGroupItem value="1-2 days" id="r2" />
+                                <p>1-2 days</p>
+                                <RadioGroupItem value="2-3 days" id="r3" />
+                                <p>2-3 days</p>
+                                <RadioGroupItem value="more than 4 days" id="r4" />
+                                <p>more than 4 days</p>
+                            </div>
+                            
+                        </RadioGroup>
                     </div>
                 </div>
                 <div>
