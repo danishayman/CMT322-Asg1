@@ -109,16 +109,52 @@ export default function Feedback(){
                         <h1 className=''>Repair Quality</h1>
                     </div>
                     <div className='justify-start w-150'>
-                        <RadioGroup orientation='horizontal' defaultValue="good">
-                            <div className="flex items-center gap-3">
-                                <RadioGroupItem value="good" id="r1" />
-                                <p>good</p>
-                                <RadioGroupItem value="acceptable" id="r2" />
-                                <p>acceptable</p>
-                                <RadioGroupItem value="bad" id="r3" />
-                                <p>bad</p>
-                            </div>
-                            
+                        <RadioGroup defaultValue="good" orientation="horizontal" className="flex gap-4">
+                            {/* Good */}
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <RadioGroupItem
+                                value="good"
+                                id="r1"
+                                className="
+                                    border-gray-400 
+                                    transition-colors duration-200
+                                    data-[state=checked]:border-green-500 
+                                    data-[state=checked]:bg-green-500
+                                    data-[state=checked]:text-white
+                                "
+                                />
+                                <p>Good</p>
+                            </label>
+
+                            {/* Acceptable */}
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <RadioGroupItem
+                                value="acceptable"
+                                id="r2"
+                                className="
+                                    border-gray-400 
+                                    transition-colors duration-200
+                                    data-[state=checked]:border-yellow-500 
+                                    data-[state=checked]:bg-yellow-500
+                                "
+                                />
+                                <p>Acceptable</p>
+                            </label>
+
+                            {/* Bad */}
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <RadioGroupItem
+                                value="bad"
+                                id="r3"
+                                className="
+                                    border-gray-400 
+                                    transition-colors duration-200
+                                    data-[state=checked]:border-red-500 
+                                    data-[state=checked]:bg-red-500
+                                "
+                                />
+                                <p>Bad</p>
+                            </label>
                         </RadioGroup>
                     </div>
                 </div>
@@ -129,14 +165,58 @@ export default function Feedback(){
                     <div className='justify-start w-150'>
                         <RadioGroup orientation='horizontal' defaultValue="comfortable">
                             <div className="flex items-center gap-3">
-                                <RadioGroupItem value="within a few hours" id="r1" />
-                                <p>within a few hours</p>
-                                <RadioGroupItem value="1-2 days" id="r2" />
-                                <p>1-2 days</p>
-                                <RadioGroupItem value="2-3 days" id="r3" />
-                                <p>2-3 days</p>
-                                <RadioGroupItem value="more than 4 days" id="r4" />
-                                <p>more than 4 days</p>
+                                <label className='flex items-center gap-2 cursor-pointer'>
+                                    <RadioGroupItem 
+                                    value="within a few hours" 
+                                    id="r1" 
+                                    className="
+                                    border-gray-400 
+                                    transition-colors duration-200
+                                    data-[state=checked]:border-red-500 
+                                    data-[state=checked]:bg-red-500
+                                    "/>
+                                    <p>within a few hours</p>
+                                </label>
+                                
+                                <label className='flex items-center gap-2 cursor-pointer'>
+                                    <RadioGroupItem 
+                                        value="1-2 days" 
+                                        id="r2" 
+                                        className="
+                                            border-gray-400 
+                                            transition-colors duration-200
+                                            data-[state=checked]:border-red-500 
+                                            data-[state=checked]:bg-red-500
+                                            "/>
+                                        <p>1-2 days</p>
+                                </label>
+
+                                <label className='flex items-center gap-2 cursor-pointer'>
+                                    <RadioGroupItem 
+                                        value="2-3 days" 
+                                        id="r3"
+                                        className="
+                                            border-gray-400 
+                                            transition-colors duration-200
+                                            data-[state=checked]:border-red-500 
+                                            data-[state=checked]:bg-red-500
+                                            " />
+                                    <p>2-3 days</p>
+                                </label>
+
+                                <label className='flex items-center gap-2 cursor-pointer'>
+                                    <RadioGroupItem 
+                                        value="more than 4 days" 
+                                        id="r4" 
+                                        className="
+                                            border-gray-400 
+                                            transition-colors duration-200
+                                            data-[state=checked]:border-red-500 
+                                            data-[state=checked]:bg-red-500
+                                            " />
+                                    <p>more than 4 days</p>
+                                </label>
+                                
                             </div>
                             
                         </RadioGroup>
