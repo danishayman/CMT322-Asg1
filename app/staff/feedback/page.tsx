@@ -2,28 +2,14 @@
 import { StatsCards } from "@/components/dashboard/stats-card"
 import { stat } from "fs"
 import { TrendingUp, Clock, CheckCircle, AlertCircle } from "lucide-react"
-
+import { RatingsChart } from "@/components/dashboard/line-chart"
 export default function DashboardPage() {
 
 const stats_data = [
   {
-    title: "Total Tickets",
+    title: "Total Feedbacks",
     value: "248",
     change: "+12%",
-    trend: "up",
-    icon: TrendingUp,
-  },
-  {
-    title: "Open Tickets",
-    value: "45",
-    change: "-5%",
-    trend: "down",
-    icon: TrendingUp,
-  },
-  {
-    title: "Resolved Today",
-    value: "23",
-    change: "+8%",
     trend: "up",
     icon: TrendingUp,
   },
@@ -35,12 +21,20 @@ const stats_data = [
     icon: TrendingUp,
   },
   {
-    title: "Student Feedbacks",
-    value: "13",
+    title: "Top Category",
+    value: "Toilet",
     change: "+15%",
     trend: "up",
     icon: TrendingUp,
   },
+  {
+    title: "Avg. Feedback Rating",
+    value: "4.5★",
+    change: "+15%",
+    trend: "up",
+    icon: TrendingUp,
+  },
+  
 ]
 
 return (
@@ -55,6 +49,7 @@ return (
               <p className="text-muted-foreground mt-1">Manage and track help-desk tickets</p>
             </div>
             <StatsCards stats={stats_data}/>
+            <RatingsChart/>
           </div>
         </main>
       </div>
