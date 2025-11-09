@@ -79,15 +79,7 @@ const getSentimentBadgeVariant = (sentiment: string) => {
 export function FeedbackCards() {
   return (
     <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Complaints & Feedback</CardTitle>
-            <CardDescription>Student feedback and complaints log</CardDescription>
-          </div>
-          <Button>View All</Button>
-        </div>
-      </CardHeader>
+      
       <CardContent>
         <div className="space-y-4">
           {feedbackData.map((feedback) => (
