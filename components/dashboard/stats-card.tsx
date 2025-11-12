@@ -17,7 +17,14 @@ interface StatCardProp{
 
 export function StatsCards({stats}:StatCardProp) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid gap-4" 
+      style={{
+        // We use a style object here for clear, direct application of 
+        // the auto-fit CSS property, which is perfectly valid in React.
+        // It creates columns that are at least 250px wide and will stretch 
+        // (1fr) to fill the row when there are fewer items.
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))'
+      }}>
       {stats.map((stat, i) => (
         <Card key={i} className="hover:shadow-lg transition-shadow">
           <CardContent className="p-6">
