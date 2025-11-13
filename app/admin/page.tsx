@@ -1,6 +1,6 @@
 "use client"
 
-import { useContext, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { StatsCards } from "@/components/dashboard/stats-card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -20,7 +20,6 @@ import {
   UserCheck,
   Users,
 } from "lucide-react"
-import { AdminSectionContext } from "./layout"
 
 type ComplaintStatus = "New" | "Assigned" | "In Progress" | "Resolved"
 type ComplaintPriority = "Low" | "Medium" | "High"
@@ -155,7 +154,6 @@ export default function AdminDashboardPage() {
     buildActivityItem("Resolved complaint #CMP-1041 (Noise complaint level 5)"),
     buildActivityItem("Followed up with staff on complaint #CMP-1043"),
   ])
-  const { activeSection } = useContext(AdminSectionContext)
 
   const [referenceNow] = useState(() => Date.now())
 
@@ -243,6 +241,7 @@ export default function AdminDashboardPage() {
     ]
   }, [totals])
 
+
   const statusBreakdown = useMemo(() => {
     return (Object.keys(statusStyles) as ComplaintStatus[]).map((status) => {
       const value = totals.byStatus[status]
@@ -324,210 +323,204 @@ export default function AdminDashboardPage() {
         </p>
       </header>
 
-      {activeSection === "overview" && (
-        <>
-          <StatsCards stats={statsData} />
+      <StatsCards stats={statsData} />
 
-          <section
-            id="overview"
-            className="grid grid-cols-1 gap-6 scroll-mt-24 xl:grid-cols-3"
-          >
-            <Card className="xl:col-span-2">
-              <CardHeader>
-                <CardTitle>Complaints by Status</CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-4">
-                {statusBreakdown.map((item) => (
-                  <div
-                    key={item.status}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="flex flex-col">
-                      <span className="font-medium">{item.status}</span>
-                      <span className="text-sm text-muted-foreground">
-                        {item.value} complaints
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="h-2 w-32 rounded-full bg-muted">
-                        <div
-                          className="h-2 rounded-full bg-primary transition-all"
-                          style={{ width: `${item.percentage}%` }}
-                        />
-                      </div>
-                      <span className="text-sm font-semibold text-muted-foreground">
-                        {item.percentage}%
-                      </span>
-                    </div>
+      <section
+        id="overview"
+        className="grid grid-cols-1 gap-6 scroll-mt-24 xl:grid-cols-3"
+      >
+        <Card className="xl:col-span-2">
+          <CardHeader>
+            <CardTitle>Complaints by Status</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            {statusBreakdown.map((item) => (
+              <div
+                key={item.status}
+                className="flex items-center justify-between"
+              >
+                <div className="flex flex-col">
+                  <span className="font-medium">{item.status}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {item.value} complaints
+                  </span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="h-2 w-32 rounded-full bg-muted">
+                    <div
+                      className="h-2 rounded-full bg-primary transition-all"
+                      style={{ width: `${item.percentage}%` }}
+                    />
                   </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Staff Workload</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {staffBreakdown.map((item) => (
-                  <div
-                    key={item.staff}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Badge variant="secondary">
-                        <Users className="h-3 w-3" />
-                        {item.staff}
-                      </Badge>
-                    </div>
-                    <span className="text-sm text-muted-foreground">
-                      {item.count} complaints
-                    </span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </section>
-        </>
-      )}
-
-      {activeSection === "complaints" && (
-        <section
-          id="complaints"
-          className="grid grid-cols-1 gap-6 scroll-mt-24 xl:grid-cols-3"
-        >
-          <Card className="xl:col-span-2">
-            <CardHeader className="flex flex-row items-center justify-between gap-4">
-              <div>
-                <CardTitle>All Complaints</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Assign complaints to staff and track their current progress.
-                </p>
+                  <span className="text-sm font-semibold text-muted-foreground">
+                    {item.percentage}%
+                  </span>
+                </div>
               </div>
-              <Badge variant="outline" className="gap-2">
-                <ClipboardList className="h-3.5 w-3.5" />
-                {complaints.length} total
-              </Badge>
-            </CardHeader>
-            <CardContent className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-border text-sm">
-                <thead className="bg-muted/60">
-                  <tr className="text-left text-xs font-semibold uppercase text-muted-foreground">
-                    <th className="py-3 pr-4">Complaint</th>
-                    <th className="py-3 pr-4">Category</th>
-                    <th className="py-3 pr-4">Priority</th>
-                    <th className="py-3 pr-4">Status</th>
-                    <th className="py-3 pr-4">Assigned Staff</th>
-                    <th className="py-3 pr-4 text-right">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {complaints.map((complaint) => {
-                    const currentValue = complaint.assignedTo ?? "Unassigned"
-                    const pendingValue = pendingAssignments[complaint.id]
-                    const selectedStaff = pendingValue ?? currentValue
-                    const canAssign =
-                      pendingValue !== undefined && pendingValue !== currentValue
+            ))}
+          </CardContent>
+        </Card>
 
-                    return (
-                      <tr key={complaint.id} className="align-top">
-                        <td className="py-4 pr-4">
-                          <div className="font-medium text-foreground">
-                            {complaint.title}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            #{complaint.id} • Submitted{" "}
-                            {formatDateLabel(complaint.submittedAt)}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            by {complaint.student}
-                          </div>
-                        </td>
-                        <td className="py-4 pr-4">
-                          <Badge variant="secondary">{complaint.category}</Badge>
-                        </td>
-                        <td className="py-4 pr-4">
-                          <Badge className={priorityStyles[complaint.priority]}>
-                            {complaint.priority}
-                          </Badge>
-                        </td>
-                        <td className="py-4 pr-4">
-                          <Badge className={statusStyles[complaint.status]}>
-                            {complaint.status}
-                          </Badge>
-                        </td>
-                        <td className="py-4 pr-4">
-                          <Select
-                            value={selectedStaff}
-                            onValueChange={(value) =>
-                              handleAssignmentChange(complaint.id, value)
-                            }
-                          >
-                            <SelectTrigger className="w-[200px]">
-                              <SelectValue
-                                placeholder="Assign staff member"
-                                aria-label="Select staff"
-                              />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {staffMembers.map((staff) => (
-                                <SelectItem key={staff} value={staff}>
-                                  {staff}
-                                </SelectItem>
-                              ))}
-                              <SelectItem value="Unassigned">
-                                Unassigned
+        <Card>
+          <CardHeader>
+            <CardTitle>Staff Workload</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {staffBreakdown.map((item) => (
+              <div
+                key={item.staff}
+                className="flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <Badge variant="secondary">
+                    <Users className="h-3 w-3" />
+                    {item.staff}
+                  </Badge>
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  {item.count} complaints
+                </span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </section>
+
+      <section
+        id="complaints"
+        className="grid grid-cols-1 gap-6 scroll-mt-24 xl:grid-cols-3"
+      >
+        <Card className="xl:col-span-2">
+          <CardHeader className="flex flex-row items-center justify-between gap-4">
+            <div>
+              <CardTitle>All Complaints</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Assign complaints to staff and track their current progress.
+              </p>
+            </div>
+            <Badge variant="outline" className="gap-2">
+              <ClipboardList className="h-3.5 w-3.5" />
+              {complaints.length} total
+            </Badge>
+          </CardHeader>
+          <CardContent className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-border text-sm">
+              <thead className="bg-muted/60">
+                <tr className="text-left text-xs font-semibold uppercase text-muted-foreground">
+                  <th className="py-3 pr-4">Complaint</th>
+                  <th className="py-3 pr-4">Category</th>
+                  <th className="py-3 pr-4">Priority</th>
+                  <th className="py-3 pr-4">Status</th>
+                  <th className="py-3 pr-4">Assigned Staff</th>
+                  <th className="py-3 pr-4 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {complaints.map((complaint) => {
+                  const currentValue = complaint.assignedTo ?? "Unassigned"
+                  const pendingValue = pendingAssignments[complaint.id]
+                  const selectedStaff = pendingValue ?? currentValue
+                  const canAssign =
+                    pendingValue !== undefined && pendingValue !== currentValue
+
+                  return (
+                    <tr key={complaint.id} className="align-top">
+                      <td className="py-4 pr-4">
+                        <div className="font-medium text-foreground">
+                          {complaint.title}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          #{complaint.id} • Submitted{" "}
+                          {formatDateLabel(complaint.submittedAt)}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          by {complaint.student}
+                        </div>
+                      </td>
+                      <td className="py-4 pr-4">
+                        <Badge variant="secondary">{complaint.category}</Badge>
+                      </td>
+                      <td className="py-4 pr-4">
+                        <Badge className={priorityStyles[complaint.priority]}>
+                          {complaint.priority}
+                        </Badge>
+                      </td>
+                      <td className="py-4 pr-4">
+                        <Badge className={statusStyles[complaint.status]}>
+                          {complaint.status}
+                        </Badge>
+                      </td>
+                      <td className="py-4 pr-4">
+                        <Select
+                          value={selectedStaff}
+                          onValueChange={(value) =>
+                            handleAssignmentChange(complaint.id, value)
+                          }
+                        >
+                          <SelectTrigger className="w-[200px]">
+                            <SelectValue
+                              placeholder="Assign staff member"
+                              aria-label="Select staff"
+                            />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {staffMembers.map((staff) => (
+                              <SelectItem key={staff} value={staff}>
+                                {staff}
                               </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </td>
-                        <td className="py-4 pr-0 text-right">
-                          <Button
-                            size="sm"
-                            variant="default"
-                            disabled={!canAssign}
-                            onClick={() => handleAssign(complaint.id)}
-                          >
-                            Assign
-                          </Button>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </CardContent>
-          </Card>
+                            ))}
+                            <SelectItem value="Unassigned">
+                              Unassigned
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </td>
+                      <td className="py-4 pr-0 text-right">
+                        <Button
+                          size="sm"
+                          variant="default"
+                          disabled={!canAssign}
+                          onClick={() => handleAssign(complaint.id)}
+                        >
+                          Assign
+                        </Button>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {activityFeed.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  No recent actions recorded. Assign a complaint to log activity.
-                </p>
-              ) : (
-                activityFeed.slice(0, 8).map((item) => (
-                  <div
-                    key={item.id}
-                    className="rounded-lg border border-border/60 bg-muted/40 p-3"
-                  >
-                    <div className="flex items-center gap-2 text-sm font-medium">
-                      <UserCheck className="h-4 w-4 text-primary" />
-                      {item.message}
-                    </div>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {item.timestamp}
-                    </p>
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {activityFeed.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No recent actions recorded. Assign a complaint to log activity.
+              </p>
+            ) : (
+              activityFeed.slice(0, 8).map((item) => (
+                <div
+                  key={item.id}
+                  className="rounded-lg border border-border/60 bg-muted/40 p-3"
+                >
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <UserCheck className="h-4 w-4 text-primary" />
+                    {item.message}
                   </div>
-                ))
-              )}
-            </CardContent>
-          </Card>
-        </section>
-      )}
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {item.timestamp}
+                  </p>
+                </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
+      </section>
     </div>
   )
 }
