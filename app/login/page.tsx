@@ -1,73 +1,123 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleStudentLogin = () => {
-    router.push('/student');
-  };
-
-  const handleStaffLogin = () => {
-    router.push('/staff');
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Route based on email domain - check more specific domains first
+    if (email.endsWith('@admin.usm.my')) {
+      router.push('/admin');
+    } else if (email.endsWith('@student.usm.my')) {
+      router.push('/student');
+    } else if (email.endsWith('@usm.my')) {
+      router.push('/staff');
+    }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      {/* Login Card */}
-      <div className="w-full max-w-md animate-fade-in">
-        <div className="bg-white rounded-lg shadow-lg p-8 md:p-10">
-          {/* Header Section */}
-          <div className="text-center mb-8">
-            {/* Title */}
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
-              Hostel Accommodation Complaint System
-            </h1>
+    <div className="flex min-h-screen">
+      {/* Left Side - Background Image */}
+      <div className="hidden lg:block lg:w-[60%] relative">
+        <Image
+          src="/login-bg.png"
+          alt="USM Campus"
+          fill
+          className="object-cover"
+          priority
+        />
+      </div>
 
-            {/* Subtitle */}
-            <p className="text-gray-600 text-lg">
-              Universiti Sains Malaysia
-            </p>
+      {/* Right Side - Login Form */}
+      <div className="w-full lg:w-[40%] bg-white flex items-center justify-center p-8">
+        <div className="w-full max-w-md">
+          {/* USM Logo */}
+          <div className="flex mb-12 justify-items-center">
+            <Image
+              src="/logo-usm.png"
+              alt="USM Logo"
+              width={280}
+              height={80}
+              className="object-contain"
+            />
           </div>
 
-          {/* Login Buttons */}
-          <div className="space-y-3 mt-8">
-            {/* Student Login Button */}
-            <button
-              onClick={handleStudentLogin}
-              className="w-full bg-[#5e2a84] hover:bg-[#4a2169] text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#5e2a84] focus:ring-offset-2"
-            >
-              Login as Student
-            </button>
+          {/* Title */}
+          <h1 className="text-3xl font-normal text-gray-800 mb-8">
+            Identity Single Sign On
+          </h1>
 
-            {/* Staff Login Button */}
-            <button
-              onClick={handleStaffLogin}
-              className="w-full bg-[#5e2a84] hover:bg-[#4a2169] text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#5e2a84] focus:ring-offset-2"
-            >
-              Login as Staff
-            </button>
+          {/* Login Form */}
+          <form onSubmit={handleLogin} className="space-y-4">
+            {/* Email Input */}
+            <div>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="*@usm.my or any *.usm.my subdomains"
+                className="w-full px-4 py-3 bg-gray-100 border-none rounded text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+
+            {/* Password Input */}
+            <div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                className="w-full px-4 py-3 bg-gray-100 border-none rounded text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+
+            {/* Sign In Button */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                className="bg-[#1a73e8] hover:bg-[#1557b0] text-white font-medium py-2.5 px-8 rounded transition-colors duration-200"
+              >
+                Sign in
+              </button>
+            </div>
+          </form>
+
+          {/* Links */}
+          <div className="mt-6 space-y-1">
+            <a href="#" className="block text-[#1a73e8] hover:underline text-sm">
+              Change Password
+            </a>
+            <a href="#" className="block text-[#1a73e8] hover:underline text-sm">
+              Forgot Account ID
+            </a>
+          </div>
+
+          {/* Need Help */}
+          <div className="mt-16">
+            <a href="#" className="text-[#1a73e8] hover:underline text-2xl font-normal">
+              Need Help?
+            </a>
+          </div>
+
+          {/* Footer Links */}
+          <div className="mt-auto pt-16 flex gap-6 text-xs text-gray-600">
+            <a href="#" className="hover:underline">
+              www.usm.my
+            </a>
+            <a href="#" className="hover:underline">
+              Privacy
+            </a>
           </div>
         </div>
       </div>
-
-      {/* Fade-in Animation */}
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.5s ease-out;
-        }
-      `}</style>
     </div>
   );
 }
