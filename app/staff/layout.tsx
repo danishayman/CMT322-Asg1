@@ -1,5 +1,6 @@
 'use client';
 
+import { icons } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import path from 'path';
 import { useState, useEffect, useRef } from 'react';
@@ -34,14 +35,17 @@ export default function StudentLayout({
     {
       name: 'Active Tickets',
       path: '/staff/tickets/active',
+      icon: 'M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2ZM12 8v4M12 16h.01',
     },
     {
       name: 'Pending Tickets',
       path: '/staff/tickets/pending',
-    },
+      icon: 'M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2ZM12 6v6l4 2',
+      },
     {
       name: 'Resolved Tickets',
       path: '/staff/tickets/resolved',
+      icon: 'M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2ZM8 12l2 2 4-4',
     },
 
   ];
