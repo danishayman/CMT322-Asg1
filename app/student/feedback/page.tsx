@@ -6,6 +6,7 @@ import {StarRating} from '@/components/ui/star_rating'
 import { Input } from '@/components/ui/input';
 import { RadioGroup , RadioGroupItem} from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import toast from 'react-hot-toast';
 import {
     Select,
     SelectContent,
@@ -15,6 +16,7 @@ import {
     SelectTrigger,
     SelectValue, 
 } from '@/components/ui/select';
+import { Sumana } from 'next/font/google';
 
 export default function Feedback(){
 
@@ -24,6 +26,11 @@ export default function Feedback(){
         comment: string;
         repair_quality: string;
         response_speed: number;
+    }
+
+    const submit = (e:React.FormEvent) =>{
+        e.preventDefault();
+        toast.success("Feedback submitted successfully!");
     }
 
     const complaints = [
@@ -223,7 +230,7 @@ export default function Feedback(){
                     </div>
                 </div>
                 <div>
-                    <Button>
+                    <Button onClick={submit}>
                         Submit
                     </Button>
                 </div>

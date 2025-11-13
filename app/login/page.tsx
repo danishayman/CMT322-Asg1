@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import toast from 'react-hot-toast';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,10 +15,16 @@ export default function LoginPage() {
     // Route based on email domain - check more specific domains first
     if (email.endsWith('@admin.usm.my')) {
       router.push('/admin');
+      toast.success("Welcome, admin!");
     } else if (email.endsWith('@student.usm.my')) {
       router.push('/student');
+      toast.success("Welcome, student!");
     } else if (email.endsWith('@usm.my')) {
       router.push('/staff');
+      toast.success("Welcome, staff!");
+    }
+    else{
+      toast.error("Please provide a valid email address")
     }
   };
 

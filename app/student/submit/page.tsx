@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, FormEvent, ChangeEvent } from 'react';
+import toast from 'react-hot-toast';
 
 interface ComplaintFormData {
   category: string;

@@ -138,18 +138,18 @@ export default function AdminLayout({
               aria-label="Toggle menu"
             >
               <svg
-                className="h-6 w-6"
+                className="h-6 w-6 flex-none"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
             </button>
 
             <button
@@ -157,23 +157,26 @@ export default function AdminLayout({
               className="hidden rounded-lg p-2 text-gray-600 transition-all duration-200 hover:bg-gray-100 hover:text-gray-900 lg:block"
               aria-label="Toggle sidebar"
             >
-              <svg
-                className="h-6 w-6"
+              <div className="flex">
+                <svg
+                className="h-6 w-6 flex-none"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d={
-                    isCollapsed
-                      ? "M13 5l7 7-7 7M5 5l7 7-7 7"
-                      : "M11 19l-7-7 7-7m8 14l-7-7 7-7"
-                  }
-                />
-              </svg>
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d={
+                      isCollapsed
+                        ? "M13 5l7 7-7 7M5 5l7 7-7 7"
+                        : "M11 19l-7-7 7-7m8 14l-7-7 7-7"
+                    }
+                  />
+                </svg>
+                <h1 className="flex-none pl-4">Navigation</h1>
+              </div>
             </button>
 
             <div className="flex items-center gap-2">
