@@ -26,7 +26,7 @@ export function TicketDetailCard({ id, category, title, description, hasPicture,
         <Card className="shadow-xl p-6 max-w-4xl mx-auto border-t-4 border-[#5e2a84]">
             <CardHeader className="p-0 mb-8">
                 <CardTitle className="text-2xl font-bold">
-                    COMPLAIN ID **#{id}**
+                    COMPLAINT DETAILS
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 p-0">
@@ -82,4 +82,5 @@ export function TicketDetailCard({ id, category, title, description, hasPicture,
             </CardContent>
         </Card>
     );
+
 }
