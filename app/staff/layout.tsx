@@ -4,6 +4,7 @@ import { icons } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import path from 'path';
 import { useState, useEffect, useRef } from 'react';
+import toast from 'react-hot-toast';
 
 export default function StudentLayout({
   children,
@@ -47,6 +48,7 @@ export default function StudentLayout({
 
   const handleLogout = () => {
     router.push('/login');
+    toast.error("Signed Out");
   };
 
   const isActive = (path: string) => pathname === path;
