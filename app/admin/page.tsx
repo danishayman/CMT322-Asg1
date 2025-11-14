@@ -1,5 +1,6 @@
 "use client"
 
+import toast from "react-hot-toast"
 import { useMemo, useState } from "react"
 import { StatsCards } from "@/components/dashboard/stats-card"
 import { Badge } from "@/components/ui/badge"
@@ -265,6 +266,7 @@ export default function AdminDashboardPage() {
       ...prev,
       [complaintId]: staff,
     }))
+    toast.success("Changed assignment to " + staff);
   }
 
   const handleAssign = (complaintId: string) => {

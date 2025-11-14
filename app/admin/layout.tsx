@@ -2,6 +2,7 @@
 
 import { createContext, useEffect, useMemo, useRef, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
+import toast from "react-hot-toast"
 
 type AdminSectionKey = "overview" | "complaints"
 
@@ -97,6 +98,7 @@ export default function AdminLayout({
 
   const handleLogout = () => {
     router.push("/login")
+    toast.error("Signed Out");
   }
 
   const isLinkActive = (link: NavLink) => {
