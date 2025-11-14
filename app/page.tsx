@@ -30,7 +30,7 @@ export default function Home() {
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Image
-              src="/usm-white-35.png"
+              src="/jata-usm-transparent.png"
               alt="USM Logo"
               width={40}
               height={40}
@@ -54,10 +54,12 @@ export default function Home() {
           <div className="bg-linear-to-br from-[#4A2169] to-[#5d2a7f] rounded-3xl shadow-2xl p-12 flex flex-col items-center justify-center text-center text-white min-h-[500px]">
             <div className="mb-8 bg-white rounded-full p-6 shadow-xl">
               <Image
-                src="/usm-crest-95.png"
+                src="/jata-usm.png"
                 alt="USM Crest"
                 width={120}
                 height={120}
+                quality={100}
+                priority
               />
             </div>
             <h2 className="text-3xl font-bold mb-4">Welcome to</h2>
