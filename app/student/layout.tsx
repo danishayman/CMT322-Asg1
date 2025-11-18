@@ -31,12 +31,6 @@ export default function StudentLayout({
       path: '/student/my-complaints', 
       icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' 
     },
-    { 
-      name: 'Send Feedback', 
-      path: '/student/feedback', 
-      icon: 'M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z' 
-    },
-
   ];
 
   const handleLogout = () => {
@@ -44,7 +38,14 @@ export default function StudentLayout({
     toast.error("Signed Out");
   };
 
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) => {
+    if (pathname === path) return true;
+    // For My Complaints, also highlight when viewing a specific complaint
+    if (path === '/student/my-complaints' && pathname.startsWith('/student/my-complaints/')) {
+      return true;
+    }
+    return false;
+  };
 
   // Handle clicking outside sidebar to collapse it
   useEffect(() => {
