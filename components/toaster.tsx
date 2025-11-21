@@ -3,10 +3,6 @@
 
 import { Toaster } from 'react-hot-toast'
 
-interface toastData {
-    message: string
-}
-
 export function ToastProvider() {
   return (
     // You can customize the position and options here
