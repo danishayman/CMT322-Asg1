@@ -1,27 +1,34 @@
 'use client';
 
 import { useState, FormEvent, ChangeEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { createComplaint, uploadComplaintPhoto } from '@/lib/actions/complaints';
+import { ComplaintCategory, ComplaintPriority } from '@/lib/types/database';
 
 interface ComplaintFormData {
   category: string;
   title: string;
   description: string;
+  priority: ComplaintPriority;
   photo: File | null;
 }
 
 export default function SubmitComplaintPage() {
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<ComplaintFormData>({
     category: '',
     title: '',
     description: '',
+    priority: 'Medium',
     photo: null,
   });
 
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const categories = [
+  const categories: ComplaintCategory[] = [
     'Room Maintenance',
     'Plumbing',
     'Electrical',
@@ -29,8 +36,14 @@ export default function SubmitComplaintPage() {
     'Common Areas',
     'Security',
     'Noise Complaint',
+    'Network',
+    'Furniture',
+    'Facilities',
+    'Discipline',
     'Other',
   ];
+
+  const priorities: ComplaintPriority[] = ['Low', 'Medium', 'High'];
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -61,28 +74,60 @@ export default function SubmitComplaintPage() {
     }
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-    // Store in component state (already stored in formData)
-    console.log('Form submitted:', formData);
-    
-    // Show success message
-    setShowSuccess(true);
-    
-    // Reset form
-    setFormData({
-      category: '',
-      title: '',
-      description: '',
-      photo: null,
-    });
-    setPhotoPreview(null);
+    setIsSubmitting(true);
 
-    // Hide success message after 5 seconds
-    setTimeout(() => {
-      setShowSuccess(false);
-    }, 5000);
+    try {
+      let photoUrl: string | null = null;
+
+      // Upload photo if provided
+      if (formData.photo) {
+        const uploadResult = await uploadComplaintPhoto(formData.photo);
+        if (!uploadResult.success) {
+          toast.error(uploadResult.error || 'Failed to upload photo');
+          setIsSubmitting(false);
+          return;
+        }
+        photoUrl = uploadResult.url || null;
+      }
+
+      // Create complaint
+      const result = await createComplaint({
+        title: formData.title,
+        description: formData.description,
+        category: formData.category as ComplaintCategory,
+        priority: formData.priority,
+        photo_url: photoUrl,
+      });
+
+      if (result.success) {
+        toast.success('Complaint submitted successfully!');
+        setShowSuccess(true);
+        
+        // Reset form
+        setFormData({
+          category: '',
+          title: '',
+          description: '',
+          priority: 'Medium',
+          photo: null,
+        });
+        setPhotoPreview(null);
+
+        // Redirect to complaints list after 2 seconds
+        setTimeout(() => {
+          router.push('/student/my-complaints');
+        }, 2000);
+      } else {
+        toast.error(result.error || 'Failed to submit complaint');
+      }
+    } catch (error) {
+      console.error('Submit error:', error);
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const removePhoto = () => {
@@ -141,7 +186,8 @@ export default function SubmitComplaintPage() {
             value={formData.category}
             onChange={handleInputChange}
             required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#5e2a84] focus:border-transparent transition-all duration-200 hover:border-gray-400 cursor-pointer"
+            disabled={isSubmitting}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#5e2a84] focus:border-transparent transition-all duration-200 hover:border-gray-400 cursor-pointer disabled:opacity-50"
           >
             <option value="">Select a category</option>
             {categories.map((cat) => (
@@ -150,6 +196,31 @@ export default function SubmitComplaintPage() {
               </option>
             ))}
           </select>
+        </div>
+
+        {/* Priority Field */}
+        <div>
+          <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-2">
+            Priority <span className="text-red-500">*</span>
+          </label>
+          <select
+            id="priority"
+            name="priority"
+            value={formData.priority}
+            onChange={handleInputChange}
+            required
+            disabled={isSubmitting}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#5e2a84] focus:border-transparent transition-all duration-200 hover:border-gray-400 cursor-pointer disabled:opacity-50"
+          >
+            {priorities.map((priority) => (
+              <option key={priority} value={priority}>
+                {priority}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-gray-500 mt-1">
+            Select High for urgent issues that need immediate attention
+          </p>
         </div>
 
         {/* Title Field */}
@@ -164,8 +235,9 @@ export default function SubmitComplaintPage() {
             value={formData.title}
             onChange={handleInputChange}
             required
+            disabled={isSubmitting}
             placeholder="Brief summary of your complaint"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5e2a84] focus:border-transparent transition-all duration-200 hover:border-gray-400"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5e2a84] focus:border-transparent transition-all duration-200 hover:border-gray-400 disabled:opacity-50"
           />
         </div>
 
@@ -180,9 +252,10 @@ export default function SubmitComplaintPage() {
             value={formData.description}
             onChange={handleInputChange}
             required
+            disabled={isSubmitting}
             rows={6}
             placeholder="Please provide detailed information about your complaint..."
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5e2a84] focus:border-transparent transition-all duration-200 hover:border-gray-400 resize-none"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5e2a84] focus:border-transparent transition-all duration-200 hover:border-gray-400 resize-none disabled:opacity-50"
           />
         </div>
 
@@ -253,24 +326,27 @@ export default function SubmitComplaintPage() {
         <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
           <button
             type="button"
+            disabled={isSubmitting}
             onClick={() => {
               setFormData({
                 category: '',
                 title: '',
                 description: '',
+                priority: 'Medium',
                 photo: null,
               });
               setPhotoPreview(null);
             }}
-            className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition-all duration-200"
+            className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50"
           >
             Clear Form
           </button>
           <button
             type="submit"
-            className="px-8 py-3 bg-[#5e2a84] text-white font-medium rounded-lg hover:bg-[#4a2169] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#5e2a84] focus:ring-offset-2 transition-all duration-200 shadow-md"
+            disabled={isSubmitting}
+            className="px-8 py-3 bg-[#5e2a84] text-white font-medium rounded-lg hover:bg-[#4a2169] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#5e2a84] focus:ring-offset-2 transition-all duration-200 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Submit Complaint
+            {isSubmitting ? 'Submitting...' : 'Submit Complaint'}
           </button>
         </div>
       </form>

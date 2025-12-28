@@ -1,86 +1,93 @@
-'use client';
+import { getStudentStats, getRecentComplaints } from '@/lib/actions/complaints';
+import { getCurrentUser } from '@/lib/actions/auth';
+import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import { ComplaintStatus } from '@/lib/types/database';
 
-export default function StudentDashboard() {
+export default async function StudentDashboard() {
+  const user = await getCurrentUser();
+  
+  if (!user) {
+    redirect('/login');
+  }
+
+  const [statsResult, recentResult] = await Promise.all([
+    getStudentStats(),
+    getRecentComplaints(5)
+  ]);
+
   const stats = [
     {
       title: 'Pending Complaints',
-      count: 3,
+      count: statsResult.data?.pending_count || 0,
       description: 'Awaiting review',
       bgColor: 'bg-red-50',
       textColor: 'text-red-600',
       borderColor: 'border-red-100',
       icon: 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+      href: '/student/my-complaints?status=Pending',
     },
     {
       title: 'In Progress',
-      count: 5,
+      count: statsResult.data?.in_progress_count || 0,
       description: 'Being handled',
       bgColor: 'bg-amber-50',
       textColor: 'text-amber-600',
       borderColor: 'border-amber-100',
       icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+      href: '/student/my-complaints?status=In%20Progress',
     },
     {
       title: 'Resolved',
-      count: 2,
+      count: statsResult.data?.resolved_count || 0,
       description: 'Successfully completed',
       bgColor: 'bg-green-50',
       textColor: 'text-green-600',
       borderColor: 'border-green-100',
       icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+      href: '/student/my-complaints?status=Resolved',
     },
   ];
 
-  const recentComplaints = [
-    {
-      id: 1,
-      title: 'Broken Air Conditioner in Room B-305',
-      category: 'Room Maintenance',
-      status: 'In Progress',
-      date: 'Oct 28, 2024',
-    },
-    {
-      id: 2,
-      title: 'Water Leakage from Bathroom Ceiling',
-      category: 'Plumbing',
-      status: 'Pending',
-      date: 'Oct 27, 2024',
-    },
-    {
-      id: 3,
-      title: 'Non-Functional Study Room Light',
-      category: 'Common Areas',
-      status: 'Resolved',
-      date: 'Oct 25, 2024',
-    },
-  ];
+  const recentComplaints = recentResult.data || [];
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: ComplaintStatus) => {
     switch (status) {
       case 'Pending':
         return 'bg-red-100 text-red-700';
       case 'In Progress':
+      case 'Assigned':
         return 'bg-amber-100 text-amber-700';
       case 'Resolved':
+      case 'Closed':
         return 'bg-green-100 text-green-700';
       default:
         return 'bg-gray-100 text-gray-700';
     }
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  };
+
   return (
     <div className="space-y-8">
       {/* Page Heading */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Welcome, Student!</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Welcome, {user.full_name}!</h1>
         <p className="text-gray-600 mt-2">Track and manage your complaints from the dashboard</p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {stats.map((stat) => (
-          <div
+          <Link
             key={stat.title}
+            href={stat.href}
             className={`
               bg-white rounded-lg shadow-sm border ${stat.borderColor}
               p-6 hover:shadow-md hover:scale-[1.02]
@@ -100,7 +107,7 @@ export default function StudentDashboard() {
               <p className="text-3xl font-bold text-gray-900 mb-1">{stat.count}</p>
               <p className="text-xs text-gray-500">{stat.description}</p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
@@ -111,40 +118,53 @@ export default function StudentDashboard() {
           <p className="text-sm text-gray-600 mt-1">Your latest submitted complaints</p>
         </div>
         
-        <div className="divide-y divide-gray-200">
-          {recentComplaints.map((complaint) => (
-            <div
-              key={complaint.id}
-              className="px-6 py-4 hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+        {recentComplaints.length === 0 ? (
+          <div className="px-6 py-12 text-center">
+            <p className="text-gray-500">No complaints submitted yet.</p>
+            <Link 
+              href="/student/submit"
+              className="inline-block mt-4 text-[#5e2a84] hover:text-[#4a2169] font-medium"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="flex-1">
-                  <h3 className="text-base font-semibold text-gray-900 mb-1">
-                    {complaint.title}
-                  </h3>
-                  <div className="flex flex-wrap items-center gap-3 text-sm">
-                    <span className="text-gray-600">
-                      <span className="font-medium text-[#5e2a84]">{complaint.category}</span>
+              Submit your first complaint →
+            </Link>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-200">
+            {recentComplaints.map((complaint) => (
+              <Link
+                key={complaint.id}
+                href={`/student/my-complaints/${complaint.id}`}
+                className="block px-6 py-4 hover:bg-gray-50 transition-colors duration-200"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div className="flex-1">
+                    <h3 className="text-base font-semibold text-gray-900 mb-1">
+                      {complaint.title}
+                    </h3>
+                    <div className="flex flex-wrap items-center gap-3 text-sm">
+                      <span className="text-gray-600">
+                        <span className="font-medium text-[#5e2a84]">{complaint.category}</span>
+                      </span>
+                      <span className="text-gray-400">•</span>
+                      <span className="text-gray-500">{formatDate(complaint.date_submitted)}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(complaint.status)}`}>
+                      {complaint.status}
                     </span>
-                    <span className="text-gray-400">•</span>
-                    <span className="text-gray-500">{complaint.date}</span>
                   </div>
                 </div>
-                <div>
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(complaint.status)}`}>
-                    {complaint.status}
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+        )}
 
         {/* View All Link */}
         <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-          <button className="text-[#5e2a84] hover:text-[#4a2169] font-medium text-sm transition-colors duration-200">
+          <Link href="/student/my-complaints" className="text-[#5e2a84] hover:text-[#4a2169] font-medium text-sm transition-colors duration-200">
             View All Complaints →
-          </button>
+          </Link>
         </div>
       </div>
     </div>
