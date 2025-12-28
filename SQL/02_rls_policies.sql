@@ -14,6 +14,11 @@ ALTER TABLE activity_log ENABLE ROW LEVEL SECURITY;
 -- USERS TABLE POLICIES
 -- =====================================================
 
+-- Allow service role to insert users (for triggers)
+CREATE POLICY "Service role can insert users"
+  ON users FOR INSERT
+  WITH CHECK (true);
+
 -- Users can view their own profile
 CREATE POLICY "Users can view own profile"
   ON users FOR SELECT
