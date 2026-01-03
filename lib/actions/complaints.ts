@@ -209,9 +209,15 @@ export async function uploadComplaintPhoto(
   const user = await requireStudent()
   const supabase = await createClient()
 
-  // Generate unique filename
+  // Get auth user ID for storage path (RLS policy uses auth.uid())
+  const { data: { user: authUser } } = await supabase.auth.getUser()
+  if (!authUser) {
+    return { success: false, error: 'Not authenticated' }
+  }
+
+  // Generate unique filename using auth_id (matches storage RLS policy)
   const fileExt = file.name.split('.').pop()
-  const fileName = `${user.id}/${Date.now()}.${fileExt}`
+  const fileName = `${authUser.id}/${Date.now()}.${fileExt}`
 
   const { data, error } = await supabase.storage
     .from('complaint-photos')
