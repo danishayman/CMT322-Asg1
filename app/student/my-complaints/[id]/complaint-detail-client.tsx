@@ -21,9 +21,10 @@ import {
 interface Props {
   complaint: ComplaintWithDetails;
   existingFeedback: Feedback | null;
+  photoSignedUrl: string | null;
 }
 
-export default function ComplaintDetailClient({ complaint, existingFeedback }: Props) {
+export default function ComplaintDetailClient({ complaint, existingFeedback, photoSignedUrl }: Props) {
   const router = useRouter();
   const [rating, setRating] = useState(existingFeedback?.overall_rating || 0);
   const [comment, setComment] = useState(existingFeedback?.comment || '');
@@ -168,11 +169,15 @@ export default function ComplaintDetailClient({ complaint, existingFeedback }: P
         {complaint.photo_url && (
           <div>
             <h2 className="text-lg font-semibold text-gray-900 mb-3">Attached Photo</h2>
-            <img 
-              src={complaint.photo_url} 
-              alt="Complaint photo" 
-              className="max-w-md rounded-lg border border-gray-200"
-            />
+            {photoSignedUrl ? (
+              <img 
+                src={photoSignedUrl} 
+                alt="Complaint photo" 
+                className="max-w-md rounded-lg border border-gray-200"
+              />
+            ) : (
+              <p className="text-gray-500 text-sm">Unable to load photo</p>
+            )}
           </div>
         )}
 

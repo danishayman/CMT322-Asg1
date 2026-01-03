@@ -231,12 +231,45 @@ export async function uploadComplaintPhoto(
     return { success: false, error: error.message }
   }
 
-  // Get public URL
-  const { data: { publicUrl } } = supabase.storage
-    .from('complaint-photos')
-    .getPublicUrl(data.path)
+  // Return the file path (not public URL since bucket is private)
+  // Signed URLs will be generated when viewing
+  return { success: true, url: data.path }
+}
 
-  return { success: true, url: publicUrl }
+/**
+ * Get signed URL for viewing a complaint photo
+ */
+export async function getComplaintPhotoUrl(
+  photoPath: string
+): Promise<{ success: boolean; url?: string; error?: string }> {
+  const supabase = await createClient()
+
+  // Extract path if it's a full URL (for backward compatibility with old records)
+  let filePath = photoPath
+  if (photoPath.includes('/storage/v1/object/public/complaint-photos/')) {
+    // Extract path from public URL
+    filePath = photoPath.split('/storage/v1/object/public/complaint-photos/')[1]
+  } else if (photoPath.includes('/storage/v1/object/sign/complaint-photos/')) {
+    // Already a signed URL, return as is
+    return { success: true, url: photoPath }
+  } else if (photoPath.startsWith('http')) {
+    // Other URL format, extract after bucket name
+    const match = photoPath.match(/complaint-photos\/(.+)/)
+    if (match) {
+      filePath = match[1]
+    }
+  }
+
+  const { data, error } = await supabase.storage
+    .from('complaint-photos')
+    .createSignedUrl(filePath, 3600) // 1 hour expiry
+
+  if (error) {
+    console.error('Get signed URL error:', error)
+    return { success: false, error: error.message }
+  }
+
+  return { success: true, url: data.signedUrl }
 }
 
 /**

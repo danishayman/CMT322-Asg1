@@ -1,4 +1,4 @@
-import { getComplaintById } from '@/lib/actions/complaints';
+import { getComplaintById, getComplaintPhotoUrl } from '@/lib/actions/complaints';
 import { getFeedbackByComplaintId } from '@/lib/actions/feedback';
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/lib/actions/auth';
@@ -47,6 +47,19 @@ export default async function ComplaintDetailPage({
 
   const complaint = result.data;
   
+  // Get signed URL for photo if it exists
+  let photoSignedUrl: string | null = null;
+  if (complaint.photo_url) {
+    console.log('Photo URL from DB:', complaint.photo_url);
+    const photoResult = await getComplaintPhotoUrl(complaint.photo_url);
+    console.log('Photo result:', photoResult);
+    if (photoResult.success && photoResult.url) {
+      photoSignedUrl = photoResult.url;
+    } else {
+      console.error('Failed to get photo URL:', photoResult.error);
+    }
+  }
+  
   // Check if feedback exists
   const feedbackResult = await getFeedbackByComplaintId(complaint.id);
   const existingFeedback = feedbackResult.data || null;
@@ -55,6 +68,7 @@ export default async function ComplaintDetailPage({
     <ComplaintDetailClient 
       complaint={complaint} 
       existingFeedback={existingFeedback}
+      photoSignedUrl={photoSignedUrl}
     />
   );
 }
