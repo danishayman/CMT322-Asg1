@@ -1,13 +1,11 @@
 'use client';
 
-import { icons } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
-import path from 'path';
 import { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { signOut } from '@/lib/actions/auth';
 
-export default function StudentLayout({
+export default function StaffLayout({
   children,
 }: {
   children: React.ReactNode;
