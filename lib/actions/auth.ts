@@ -207,6 +207,32 @@ export async function requireStudent(): Promise<User> {
 }
 
 /**
+ * Require staff role or redirect
+ */
+export async function requireStaff(): Promise<User> {
+  const user = await requireAuth()
+
+  if (user.user_role !== 'staff') {
+    redirect(`/${user.user_role}`)
+  }
+
+  return user
+}
+
+/**
+ * Require admin role or redirect
+ */
+export async function requireAdmin(): Promise<User> {
+  const user = await requireAuth()
+
+  if (user.user_role !== 'admin') {
+    redirect(`/${user.user_role}`)
+  }
+
+  return user
+}
+
+/**
  * Check if user is authenticated (for client components)
  */
 export async function checkAuth(): Promise<{ authenticated: boolean; role?: UserRole }> {
