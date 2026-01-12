@@ -15,10 +15,10 @@ interface Props {
   initialFilter: string;
 }
 
-export default function ComplaintsListClient({ 
-  initialComplaints, 
+export default function ComplaintsListClient({
+  initialComplaints,
   initialStats,
-  initialFilter 
+  initialFilter
 }: Props) {
   const [filter, setFilter] = useState<string>(initialFilter);
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,7 +26,10 @@ export default function ComplaintsListClient({
   const filterOptions = ['All', 'Pending', 'In Progress', 'Resolved', 'Closed'];
 
   const filteredComplaints = initialComplaints.filter((complaint) => {
-    const matchesFilter = filter === 'All' || complaint.status === filter;
+    // Handle "In Progress" filter to also match "Assigned" status
+    const matchesFilter = filter === 'All' ||
+      complaint.status === filter ||
+      (filter === 'In Progress' && complaint.status === 'Assigned');
     const matchesSearch =
       complaint.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       complaint.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -136,11 +139,10 @@ export default function ComplaintsListClient({
               <button
                 key={option}
                 onClick={() => setFilter(option)}
-                className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
-                  filter === option
+                className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${filter === option
                     ? 'bg-[#5e2a84] text-white shadow-md'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                  }`}
               >
                 {option}
               </button>

@@ -10,7 +10,7 @@ export default async function MyComplaintsPage({
   searchParams: Promise<{ status?: string }>;
 }) {
   const user = await getCurrentUser();
-  
+
   if (!user) {
     redirect('/login');
   }
@@ -18,20 +18,21 @@ export default async function MyComplaintsPage({
   const params = await searchParams;
   const statusFilter = params.status as ComplaintStatus | undefined;
 
-  const result = await getMyComplaints(statusFilter || 'all');
-  const complaints = result.data || [];
+  // Always fetch all complaints - client will handle filtering
+  const allResult = await getMyComplaints('all');
+  const allComplaints = allResult.data || [];
 
-  // Calculate stats
+  // Calculate stats from ALL complaints
   const stats = {
-    total: complaints.length,
-    pending: complaints.filter(c => c.status === 'Pending').length,
-    inProgress: complaints.filter(c => c.status === 'In Progress' || c.status === 'Assigned').length,
-    resolved: complaints.filter(c => c.status === 'Resolved').length,
+    total: allComplaints.length,
+    pending: allComplaints.filter(c => c.status === 'Pending').length,
+    inProgress: allComplaints.filter(c => c.status === 'In Progress' || c.status === 'Assigned').length,
+    resolved: allComplaints.filter(c => c.status === 'Resolved').length,
   };
 
   return (
-    <ComplaintsListClient 
-      initialComplaints={complaints}
+    <ComplaintsListClient
+      initialComplaints={allComplaints}
       initialStats={stats}
       initialFilter={statusFilter || 'All'}
     />
