@@ -1,7 +1,7 @@
-"use client"
+ "use client"
 
 import toast from "react-hot-toast"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { StatsCards } from "@/components/dashboard/stats-card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -33,7 +33,8 @@ interface Complaint {
   priority: ComplaintPriority
   submittedAt: string
   status: ComplaintStatus
-  assignedTo?: string
+  assignedStaffId?: string
+  assignedStaffName?: string
 }
 
 interface ActivityItem {
@@ -42,74 +43,13 @@ interface ActivityItem {
   timestamp: string
 }
 
-const staffMembers = [
-  "Alicia Tan",
-  "Ahmad Rahman",
-  "Grace Lim",
-  "Nurul Huda",
-  "Vinod Kumar",
-]
+interface StaffMember {
+  id: string
+  name: string
+}
 
-const initialComplaints: Complaint[] = [
-  {
-    id: "CMP-1045",
-    student: "Siti Aisyah",
-    title: "Internet outage at Block B",
-    category: "Network",
-    priority: "High",
-    submittedAt: "2025-11-12T08:30:00Z",
-    status: "New",
-  },
-  {
-    id: "CMP-1044",
-    student: "Michael Lee",
-    title: "Broken desk in room 3A",
-    category: "Furniture",
-    priority: "Medium",
-    submittedAt: "2025-11-11T10:05:00Z",
-    status: "Assigned",
-    assignedTo: "Grace Lim",
-  },
-  {
-    id: "CMP-1043",
-    student: "Nur Izzati",
-    title: "Air conditioner leaking",
-    category: "Facilities",
-    priority: "High",
-    submittedAt: "2025-11-09T20:45:00Z",
-    status: "In Progress",
-    assignedTo: "Ahmad Rahman",
-  },
-  {
-    id: "CMP-1042",
-    student: "Daniel Chong",
-    title: "Request for room repainting",
-    category: "Facilities",
-    priority: "Low",
-    submittedAt: "2025-11-08T09:12:00Z",
-    status: "New",
-  },
-  {
-    id: "CMP-1041",
-    student: "Fatimah Zahra",
-    title: "Noise complaint level 5",
-    category: "Discipline",
-    priority: "Medium",
-    submittedAt: "2025-11-05T22:16:00Z",
-    status: "Resolved",
-    assignedTo: "Vinod Kumar",
-  },
-  {
-    id: "CMP-1040",
-    student: "Alex Wong",
-    title: "Lost key replacement",
-    category: "Security",
-    priority: "Low",
-    submittedAt: "2025-11-03T14:20:00Z",
-    status: "Assigned",
-    assignedTo: "Alicia Tan",
-  },
-]
+// Data is loaded from the backend; keep this for potential placeholders if needed
+const initialComplaints: Complaint[] = []
 
 const statusStyles: Record<ComplaintStatus, string> = {
   New: "bg-sky-100 text-sky-700",
@@ -151,10 +91,93 @@ export default function AdminDashboardPage() {
   const [pendingAssignments, setPendingAssignments] = useState<
     Record<string, string>
   >({})
-  const [activityFeed, setActivityFeed] = useState<ActivityItem[]>([
-    buildActivityItem("Resolved complaint #CMP-1041 (Noise complaint level 5)"),
-    buildActivityItem("Followed up with staff on complaint #CMP-1043"),
-  ])
+  const [activityFeed, setActivityFeed] = useState<ActivityItem[]>([])
+  const [staffMembers, setStaffMembers] = useState<StaffMember[]>([])
+
+  useEffect(() => {
+    async function loadComplaints() {
+      try {
+        const res = await fetch("/api/admin/complaints", { cache: "no-store" })
+        if (!res.ok) throw new Error("Failed to load complaints")
+
+        const data: unknown = await res.json()
+
+        type SupaComplaint = {
+          complaint_id?: string
+          id?: string
+          student_name?: string
+          student?: { full_name?: string }
+          title?: string
+          category?: string
+          priority?: string
+          date_submitted?: string
+          created_at?: string
+          status?: string
+          staff_id?: string
+          staff_name?: string
+          assigned_staff?: { id?: string; full_name?: string }
+        }
+
+        const mapped: Complaint[] = (data as SupaComplaint[]).map((r) => ({
+          id: String(r.complaint_id ?? r.id),
+          student: r.student_name ?? r.student?.full_name ?? "Unknown",
+          title: String(r.title ?? ""),
+          category: String(r.category ?? ""),
+          priority:
+            (r.priority === "High" || r.priority === "Low" || r.priority === "Medium"
+              ? r.priority
+              : "Medium") as ComplaintPriority,
+          submittedAt: String(r.date_submitted ?? r.created_at ?? ""),
+          status: ((): ComplaintStatus => {
+            switch (r.status) {
+              case "Assigned":
+                return "Assigned"
+              case "In Progress":
+                return "In Progress"
+              case "Resolved":
+                return "Resolved"
+              default:
+                return "New"
+            }
+          })(),
+          assignedStaffId: r.staff_id ?? r.assigned_staff?.id ?? undefined,
+          assignedStaffName: r.staff_name ?? r.assigned_staff?.full_name ?? undefined,
+        }))
+
+        setComplaints(mapped)
+      } catch (error) {
+        console.error(error)
+        toast.error("Failed to load complaints")
+      }
+    }
+
+    async function loadActivity() {
+      try {
+        const res = await fetch("/api/admin/activity", { cache: "no-store" })
+        if (!res.ok) throw new Error("Failed to load activity")
+        const data = await res.json()
+        setActivityFeed(data as ActivityItem[])
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    async function loadStaff() {
+      try {
+        const res = await fetch("/api/admin/staff", { cache: "no-store" })
+        if (!res.ok) throw new Error("Failed to load staff")
+        const data = await res.json()
+        setStaffMembers(data as StaffMember[])
+      } catch (error) {
+        console.error(error)
+        toast.error("Failed to load staff list")
+      }
+    }
+
+    loadComplaints()
+    loadActivity()
+    loadStaff()
+  }, [])
 
   const [referenceNow] = useState(() => Date.now())
 
@@ -166,7 +189,7 @@ export default function AdminDashboardPage() {
         acc.total += 1
         acc.byStatus[complaint.status] += 1
 
-        if (!complaint.assignedTo) {
+        if (!complaint.assignedStaffId) {
           acc.unassigned += 1
         }
 
@@ -175,10 +198,10 @@ export default function AdminDashboardPage() {
           acc.newThisWeek += 1
         }
 
-        if (complaint.assignedTo) {
+        if (complaint.assignedStaffId) {
           acc.byStaff.set(
-            complaint.assignedTo,
-            (acc.byStaff.get(complaint.assignedTo) ?? 0) + 1,
+            complaint.assignedStaffId,
+            (acc.byStaff.get(complaint.assignedStaffId) ?? 0) + 1,
           )
         }
 
@@ -256,10 +279,11 @@ export default function AdminDashboardPage() {
 
   const staffBreakdown = useMemo(() => {
     return staffMembers.map((staff) => ({
-      staff,
-      count: totals.byStaff.get(staff) ?? 0,
+      staffName: staff.name,
+      staffId: staff.id,
+      count: totals.byStaff.get(staff.id) ?? 0,
     }))
-  }, [totals])
+  }, [totals, staffMembers])
 
   const handleAssignmentChange = (complaintId: string, staff: string) => {
     setPendingAssignments((prev) => ({
@@ -269,11 +293,24 @@ export default function AdminDashboardPage() {
     toast.success("Changed assignment to " + staff);
   }
 
-  const handleAssign = (complaintId: string) => {
+  const handleAssign = async (complaintId: string) => {
     const staff = pendingAssignments[complaintId]
     if (!staff) return
 
-    setComplaints((prev) =>
+    try {
+      const assigned_staff_id = staff === "Unassigned" ? null : staff
+
+      const res = await fetch(`/api/admin/complaints/${complaintId}/assign`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assigned_staff_id }),
+      })
+
+      if (!res.ok) {
+        throw new Error("Failed to update assignment")
+      }
+
+      setComplaints((prev) =>
       prev.map((complaint) => {
         if (complaint.id !== complaintId) {
           return complaint
@@ -284,35 +321,46 @@ export default function AdminDashboardPage() {
         if (staff === "Unassigned") {
           return {
             ...complaint,
-            assignedTo: undefined,
+            assignedStaffId: undefined,
+            assignedStaffName: undefined,
             status: isResolved ? "Resolved" : "New",
           }
         }
 
         const nextStatus: ComplaintStatus = isResolved ? "Resolved" : "Assigned"
 
+        const staffName =
+          staffMembers.find((s) => s.id === staff)?.name ?? complaint.assignedStaffName
+
         return {
           ...complaint,
-          assignedTo: staff,
+          assignedStaffId: staff,
+          assignedStaffName: staffName,
           status: nextStatus,
         }
       }),
-    )
+      )
 
-    setActivityFeed((prev) => [
-      buildActivityItem(
-        staff === "Unassigned"
-          ? `Marked complaint #${complaintId} as unassigned`
-          : `Assigned complaint #${complaintId} to ${staff}`,
-      ),
-      ...prev,
-    ])
+      setActivityFeed((prev) => [
+        buildActivityItem(
+          staff === "Unassigned"
+            ? `Marked complaint #${complaintId} as unassigned`
+            : `Assigned complaint #${complaintId} to ${staff}`,
+        ),
+        ...prev,
+      ])
 
-    setPendingAssignments((prev) => {
-      const updated = { ...prev }
-      delete updated[complaintId]
-      return updated
-    })
+      setPendingAssignments((prev) => {
+        const updated = { ...prev }
+        delete updated[complaintId]
+        return updated
+      })
+
+      toast.success("Assignment updated")
+    } catch (error) {
+      console.error(error)
+      toast.error("Failed to update assignment")
+    }
   }
 
   return (
@@ -370,13 +418,13 @@ export default function AdminDashboardPage() {
           <CardContent className="space-y-4">
             {staffBreakdown.map((item) => (
               <div
-                key={item.staff}
+                key={item.staffId}
                 className="flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
                   <Badge variant="secondary">
                     <Users className="h-3 w-3" />
-                    {item.staff}
+                    {item.staffName}
                   </Badge>
                 </div>
                 <span className="text-sm text-muted-foreground">
@@ -419,7 +467,7 @@ export default function AdminDashboardPage() {
               </thead>
               <tbody className="divide-y divide-border">
                 {complaints.map((complaint) => {
-                  const currentValue = complaint.assignedTo ?? "Unassigned"
+                  const currentValue = complaint.assignedStaffId ?? "Unassigned"
                   const pendingValue = pendingAssignments[complaint.id]
                   const selectedStaff = pendingValue ?? currentValue
                   const canAssign =
@@ -453,7 +501,11 @@ export default function AdminDashboardPage() {
                         </Badge>
                       </td>
                       <td className="py-4 pr-4">
-                        <Select
+                        <div className="flex flex-col gap-1">
+                          <div className="text-xs text-muted-foreground">
+                            {complaint.assignedStaffName ?? "Unassigned"}
+                          </div>
+                          <Select
                           value={selectedStaff}
                           onValueChange={(value) =>
                             handleAssignmentChange(complaint.id, value)
@@ -467,15 +519,16 @@ export default function AdminDashboardPage() {
                           </SelectTrigger>
                           <SelectContent>
                             {staffMembers.map((staff) => (
-                              <SelectItem key={staff} value={staff}>
-                                {staff}
+                              <SelectItem key={staff.id} value={staff.id}>
+                                {staff.name}
                               </SelectItem>
                             ))}
                             <SelectItem value="Unassigned">
                               Unassigned
                             </SelectItem>
                           </SelectContent>
-                        </Select>
+                          </Select>
+                        </div>
                       </td>
                       <td className="py-4 pr-0 text-right">
                         <Button
