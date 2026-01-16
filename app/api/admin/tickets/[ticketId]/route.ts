@@ -53,16 +53,16 @@ export async function GET(
     // Await the params to ensure it's resolved
     const resolvedParams = await Promise.resolve(params);
     const ticketId = resolvedParams.ticketId;
-    
+
     if (!ticketId) {
       return NextResponse.json(
-        { error: 'Ticket ID is required' }, 
+        { error: 'Ticket ID is required' },
         { status: 400 }
       );
     }
 
     const supabase = await createClient();
-    
+
     const { data: ticket, error: ticketError } = await supabase
       .from('complaints')
       .select(`
@@ -76,17 +76,17 @@ export async function GET(
     if (ticketError) {
       console.error('Error fetching ticket:', ticketError);
       return NextResponse.json(
-        { 
+        {
           error: 'Failed to fetch ticket',
-          details: ticketError.message 
-        }, 
+          details: ticketError.message
+        },
         { status: 500 }
       );
     }
 
     if (!ticket) {
       return NextResponse.json(
-        { error: 'Ticket not found' }, 
+        { error: 'Ticket not found' },
         { status: 404 }
       );
     }
@@ -113,10 +113,10 @@ export async function GET(
   } catch (error) {
     console.error('Error in GET /api/admin/tickets/[ticketId]:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Internal server error',
         details: error instanceof Error ? error.message : 'An unknown error occurred'
-      }, 
+      },
       { status: 500 }
     );
   }
@@ -140,10 +140,10 @@ export async function PATCH(
     }
 
     const supabase = await createClient();
-    
+
     // Get current user
     const { data: { user } } = await supabase.auth.getUser();
-    
+
     if (!user) {
       return NextResponse.json(
         { error: 'Not authenticated' },
@@ -166,14 +166,11 @@ export async function PATCH(
     }
 
     const updateData: any = { status };
-    
-    // Only update these fields if the status is actually changing
-    if (status === 'in-progress' && currentTicket.status !== 'in-progress') {
-      updateData.assigned_to = user.id;
-      updateData.date_started = new Date().toISOString();
-    } else if (status === 'resolved' && currentTicket.status !== 'resolved') {
-      updateData.date_resolved = new Date().toISOString();
-    }
+    const statusLower = status.toLowerCase();
+    const currentStatusLower = currentTicket.status.toLowerCase();
+
+    // date_resolved is handled by database trigger when status becomes 'Resolved'
+    // We just need to update the status - other fields are handled by triggers
 
     // Perform the update
     const { data: updatedTicket, error: updateError } = await supabase
@@ -190,9 +187,9 @@ export async function PATCH(
     if (updateError) {
       console.error('Error updating ticket:', updateError);
       return NextResponse.json(
-        { 
+        {
           error: 'Failed to update ticket status',
-          details: updateError.message 
+          details: updateError.message
         },
         { status: 500 }
       );
@@ -220,7 +217,7 @@ export async function PATCH(
   } catch (error) {
     console.error('Error in PATCH /api/admin/tickets/[ticketId]:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Internal server error',
         details: error instanceof Error ? error.message : 'An unknown error occurred'
       },

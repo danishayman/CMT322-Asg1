@@ -36,12 +36,12 @@ export default function TicketDetailContent({ ticketId }: TicketDetailContentPro
 
   const fetchTicket = async () => {
     if (!ticketId) return;
-    
+
     try {
       setLoading(true);
       console.log('Fetching ticket with ID:', ticketId);
       const response = await fetch(`/api/admin/tickets/${ticketId}`);
-      
+
       console.log('API Response:', {
         status: response.status,
         statusText: response.statusText,
@@ -82,11 +82,11 @@ export default function TicketDetailContent({ ticketId }: TicketDetailContentPro
 
   const updateTicketStatus = async (newStatus: string) => {
     if (!ticket) return;
-    
+
     try {
       setUpdating(true);
       setError(null);
-      
+
       console.log('Updating ticket status to:', newStatus);
       const response = await fetch(`/api/admin/tickets/${ticketId}`, {
         method: 'PATCH',
@@ -116,12 +116,12 @@ export default function TicketDetailContent({ ticketId }: TicketDetailContentPro
 
       // Show success message
       setError(null);
-      
+
       // Redirect after a short delay
       setTimeout(() => {
-        router.push('/staff/tickets');
+        router.push('/staff');
       }, 1000);
-      
+
     } catch (err: any) {
       console.error('Update error details:', {
         error: err,
@@ -190,9 +190,9 @@ export default function TicketDetailContent({ ticketId }: TicketDetailContentPro
       <div className="flex justify-between items-center mb-4 p-4 bg-gray-50 rounded-lg">
         <h1 className="text-2xl font-bold">Ticket Details</h1>
         <div className="flex items-center space-x-4">
-          {(ticket.status === 'pending' || ticket.status === 'assigned') ? (
+          {(['pending', 'assigned'].includes(ticket.status.toLowerCase())) ? (
             <Button
-              onClick={() => updateTicketStatus('in-progress')}
+              onClick={() => updateTicketStatus('In Progress')}
               className="bg-blue-600 hover:bg-blue-700"
               disabled={updating}
             >
@@ -202,9 +202,9 @@ export default function TicketDetailContent({ ticketId }: TicketDetailContentPro
                 'Start Working'
               )}
             </Button>
-          ) : ticket.status === 'in-progress' ? (
+          ) : ticket.status.toLowerCase() === 'in progress' ? (
             <Button
-              onClick={() => updateTicketStatus('resolved')}
+              onClick={() => updateTicketStatus('Resolved')}
               className="bg-green-600 hover:bg-green-700"
               disabled={updating}
             >
@@ -217,13 +217,13 @@ export default function TicketDetailContent({ ticketId }: TicketDetailContentPro
           ) : null}
         </div>
       </div>
-      
+
       <div className="bg-white rounded-lg shadow p-6">
         <TicketDetailCard
           id={ticket.id}
           title={ticket.title}
           description={ticket.description}
-          status={ticket.status === 'assigned' ? 'pending' : ticket.status}
+          status={ticket.status.toLowerCase() === 'assigned' ? 'Pending' : ticket.status}
           priority={ticket.priority}
           dateSubmitted={ticket.date_submitted}
           category={ticket.category}
