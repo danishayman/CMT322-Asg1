@@ -5,21 +5,21 @@ import { usePathname, useRouter } from "next/navigation"
 import toast from "react-hot-toast"
 import { signOut } from "@/lib/actions/auth"
 
-type AdminSectionKey = "overview" | "complaints"
+type AdminSectionKey = "overview" | "complaints" | "reviews"
 
 type NavLink =
   | {
-      name: string
-      type: "route"
-      path: string
-      icon: string
-    }
+    name: string
+    type: "route"
+    path: string
+    icon: string
+  }
   | {
-      name: string
-      type: "anchor"
-      targetId: AdminSectionKey
-      icon: string
-    }
+    name: string
+    type: "anchor"
+    targetId: AdminSectionKey
+    icon: string
+  }
 
 export const AdminSectionContext = createContext<{
   activeSection: AdminSectionKey
@@ -93,6 +93,12 @@ export default function AdminLayout({
         targetId: "complaints",
         icon: "M12 20h9M12 4h9m-9 8h9M3 7h6v10H3z",
       },
+      {
+        name: "Reviews",
+        type: "route",
+        path: "/admin/reviews",
+        icon: "M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z",
+      },
     ],
     [],
   )
@@ -145,14 +151,14 @@ export default function AdminLayout({
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
             </button>
 
             <button
@@ -162,10 +168,10 @@ export default function AdminLayout({
             >
               <div className="flex">
                 <svg
-                className="h-6 w-6 flex-none"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+                  className="h-6 w-6 flex-none"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
                   <path
                     strokeLinecap="round"
@@ -199,11 +205,9 @@ export default function AdminLayout({
 
         <aside
           ref={sidebarRef}
-          className={`fixed left-0 top-16 z-20 h-[calc(100vh-4rem)] transform border-r border-gray-200 bg-white shadow-lg transition-all duration-300 ease-in-out ${
-            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } lg:translate-x-0 ${
-            isCollapsed ? "lg:w-20 lg:cursor-pointer" : "lg:w-64"
-          }`}
+          className={`fixed left-0 top-16 z-20 h-[calc(100vh-4rem)] transform border-r border-gray-200 bg-white shadow-lg transition-all duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+            } lg:translate-x-0 ${isCollapsed ? "lg:w-20 lg:cursor-pointer" : "lg:w-64"
+            }`}
           onClick={(event) => {
             if (
               isCollapsed &&
@@ -220,11 +224,10 @@ export default function AdminLayout({
                 <button
                   key={link.name}
                   onClick={() => handleNavClick(link)}
-                  className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200 ${
-                    isLinkActive(link)
-                      ? "bg-[#5e2a84] text-white shadow-md"
-                      : "text-gray-700 hover:bg-purple-50 hover:text-[#5e2a84]"
-                  } ${isCollapsed ? "lg:justify-center" : ""}`}
+                  className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200 ${isLinkActive(link)
+                    ? "bg-[#5e2a84] text-white shadow-md"
+                    : "text-gray-700 hover:bg-purple-50 hover:text-[#5e2a84]"
+                    } ${isCollapsed ? "lg:justify-center" : ""}`}
                   title={isCollapsed ? link.name : ""}
                 >
                   <svg
@@ -249,9 +252,8 @@ export default function AdminLayout({
 
             <button
               onClick={handleLogout}
-              className={`mt-auto flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-red-50 hover:text-red-600 ${
-                isCollapsed ? "lg:justify-center" : ""
-              }`}
+              className={`mt-auto flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-red-50 hover:text-red-600 ${isCollapsed ? "lg:justify-center" : ""
+                }`}
               title={isCollapsed ? "Logout" : ""}
             >
               <svg
@@ -280,9 +282,8 @@ export default function AdminLayout({
         )}
 
         <main
-          className={`min-h-screen pt-16 transition-all duration-300 ease-in-out ${
-            isCollapsed ? "lg:pl-20" : "lg:pl-64"
-          }`}
+          className={`min-h-screen pt-16 transition-all duration-300 ease-in-out ${isCollapsed ? "lg:pl-20" : "lg:pl-64"
+            }`}
         >
           <div className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">{children}</div>
         </main>
