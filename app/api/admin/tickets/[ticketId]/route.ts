@@ -100,6 +100,7 @@ export async function GET(
       priority: ticket.priority,
       date_submitted: ticket.date_submitted,
       category: ticket.category,
+      photo_url: ticket.photo_url,
       studentName: getStudentName(ticket.student),
       studentEmail: getStudentEmail(ticket.student),
       assignedTo: ticket.assigned_to_user ? {

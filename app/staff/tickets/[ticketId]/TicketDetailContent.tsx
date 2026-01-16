@@ -14,6 +14,7 @@ interface Ticket {
   priority: string
   date_submitted: string
   category: string
+  photo_url?: string | null
   studentName: string
   studentEmail: string
   assignedTo: {
@@ -230,6 +231,7 @@ export default function TicketDetailContent({ ticketId }: TicketDetailContentPro
           studentName={ticket.studentName}
           studentEmail={ticket.studentEmail}
           assignedTo={ticket.assignedTo}
+          photoUrl={ticket.photo_url}
         />
       </div>
     </div>

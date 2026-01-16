@@ -21,6 +21,7 @@ interface TicketDetailCardProps {
   studentName: string;
   studentEmail: string;
   assignedTo: AssignedTo | null;
+  photoUrl?: string | null;
 }
 
 export function TicketDetailCard({
@@ -34,6 +35,7 @@ export function TicketDetailCard({
   studentName,
   studentEmail,
   assignedTo,
+  photoUrl,
 }: TicketDetailCardProps) {
   if (!id) {
     return <Card>Ticket Not Found</Card>;
@@ -98,6 +100,19 @@ export function TicketDetailCard({
           <h3 className="font-medium">Description</h3>
           <p className="text-muted-foreground">{description}</p>
         </div>
+
+        {photoUrl && (
+          <div>
+            <h3 className="font-medium mb-2">Attached Photo</h3>
+            <div className="relative">
+              <img
+                src={photoUrl}
+                alt="Complaint photo"
+                className="max-w-full max-h-96 rounded-lg border object-contain"
+              />
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
