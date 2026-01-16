@@ -47,12 +47,11 @@ function getStudentEmail(student: Student | Student[] | null | undefined): strin
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { ticketId: string } }
+  { params }: { params: Promise<{ ticketId: string }> }
 ) {
   try {
-    // Await the params to ensure it's resolved
-    const resolvedParams = await Promise.resolve(params);
-    const ticketId = resolvedParams.ticketId;
+    // Await the params (required in Next.js 15+)
+    const { ticketId } = await params;
 
     if (!ticketId) {
       return NextResponse.json(
@@ -125,12 +124,11 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { ticketId: string } }
+  { params }: { params: Promise<{ ticketId: string }> }
 ) {
   try {
-    // Await the params to ensure it's resolved
-    const resolvedParams = await Promise.resolve(params);
-    const ticketId = resolvedParams.ticketId;
+    // Await the params (required in Next.js 15+)
+    const { ticketId } = await params;
     const { status } = await request.json();
 
     if (!ticketId || !status) {
